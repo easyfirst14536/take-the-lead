@@ -26,7 +26,7 @@ our team
 
 ## 👥 团队成员
 - [@刘佳浩](https://github.com/easyfirst14536/take-the-lead/blob/main/liujiahao.md)
-- [@Member2](https://github.com/)
+- [@庄伟浩](https://github.com/easyfirst14536/take-the-lead/blob/main/haoco3.md)
 - [@Member3](https://github.com/)
 
 ## 🎯 团队理念

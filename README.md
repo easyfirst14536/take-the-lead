@@ -19,7 +19,7 @@ our team
 ## 👥 团队成员
 - [@刘佳浩](https://github.com/easyfirst14536/take-the-lead/blob/main/liujiahao.md)
 - [@庄伟浩](https://github.com/easyfirst14536/take-the-lead/blob/main/haoco3.md)
-- [@Member3](https://github.com/)
+- [@张逸川](https://github.com/easyfirst14536/take-the-lead/blob/main/Frenkie.md)
 
 ## 🎯 团队理念
 笃学不怠，协同致远，以技术立身，以工程立业。

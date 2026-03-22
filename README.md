@@ -25,7 +25,7 @@ our team
 ![VSCode](https://img.shields.io/badge/VS_Code-007ACC?style=flat&logo=visual-studio-code&logoColor=white)
 
 ## 👥 团队成员
-- [@Member1](https://github.com/)
+- [@刘佳浩](https://github.com/easyfirst14536)
 - [@Member2](https://github.com/)
 - [@Member3](https://github.com/)
 

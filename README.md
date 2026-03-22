@@ -16,14 +16,6 @@ our team
 - 代码质量管控与工程化实践
 - 问题排查、性能优化与持续集成
 
-## 🚀 技术栈
-![Java](https://img.shields.io/badge/Java-ED8B00?style=flat&logo=openjdk&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
-![C](https://img.shields.io/badge/C-A8B9CC?style=flat&logo=c&logoColor=white)
-![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white)
-![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)
-![VSCode](https://img.shields.io/badge/VS_Code-007ACC?style=flat&logo=visual-studio-code&logoColor=white)
-
 ## 👥 团队成员
 - [@刘佳浩](https://github.com/easyfirst14536/take-the-lead/blob/main/liujiahao.md)
 - [@庄伟浩](https://github.com/easyfirst14536/take-the-lead/blob/main/haoco3.md)
@@ -35,3 +27,17 @@ our team
 
 ---
 💻 持续学习 · 持续进步 · 一马当先
+
+# 团队logo
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/44a8a7a7-b7df-426e-b84b-9e51315cff52" />
+
+### 设计理念
+本Logo以“简约科技”为核心设计理念.
+
+一马当先，步步前行： 采用白色科技线条刻画跃起的骏马，内嵌电路纹理与数据节点，象征软件工程的逻辑感与马年勇往直前的动力。
+
+三人同行，协作创新： 马身由三个几何板块交织而成，代表团队三人紧密协作、同频进发，在技术探索中不断寻求创新突破。
+
+深蓝背景，层次渐变： 以深邃蓝为主基调，配合由内向外的发散光感，营造出沉稳且充满智慧的科技氛围，寓意团队在探索中持续成长。
+### 生成过程
+我们将“简约科技”作为核心，结合大学生团队“三人同行”与“马年奋进”的愿景，利用Gemini进行创作。通过输入精准的关键词（白色科技线条马、深蓝渐变层次、几何协作结构），历经数轮迭代与细节微调，最终生成了这款象征热爱、协作与创新，且符合 500x500px 以上正方形 PNG 格式的独特团队 Logo。

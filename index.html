@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>AI 任务助手</title>
+    <style>
+        body{max-width:600px;margin:20px auto;font-family:Arial}
+        .chat{border:1px solid #ddd;padding:15px;height:400px;overflow-y:auto;margin-bottom:10px;border-radius:8px}
+        .msg{margin:8px 0;padding:10px;border-radius:6px;white-space:pre-wrap}
+        .user{background:#e3f2fd;text-align:right}
+        .bot{background:#f5f5f5;text-align:left}
+        input{width:70%;padding:10px}
+        button{padding:10px 16px}
+        .tip{color:#888;margin-bottom:10px}
+    </style>
+</head>
+<body>
+    <h2>AI 任务助手智能体</h2>
+    <div class="tip">支持查询天气、记忆内容、回忆已记忆内容。示例：广州天气、北京明天预报、记住我喜欢Python、你记得什么。</div>
+    <div class="chat" id="chat"></div>
+    <input id="msg" placeholder="输入消息…" />
+    <button onclick="send()">发送</button>
+    <button onclick="clearChat()">清空</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        async function send() {
+            let text = document.getElementById("msg").value.trim();
+            if (!text) return;
+            showMsg(text, "user");
+            document.getElementById("msg").value = "";
+
+            try {
+                let res = await axios.post("http://localhost:8000/agent", {
+                    message: text
+                });
+                showMsg(res.data.reply, "bot");
+            } catch (err) {
+                showMsg("⚠️ 无法连接到后端，请先启动 Python 服务：uvicorn main:app --reload", "bot");
+            }
+        }
+
+        function showMsg(text, role) {
+            let dom = document.createElement("div");
+            dom.className = "msg " + role;
+            dom.innerText = text;
+            document.getElementById("chat").appendChild(dom);
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        async function clearChat() {
+            await axios.post("http://localhost:8000/clear");
+            document.getElementById("chat").innerHTML = "";
+        }
+    </script>
+</body>
+</html>

@@ -1,57 +1,398 @@
-﻿<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>AI 任务助手</title>
-    <style>
-        body{max-width:600px;margin:20px auto;font-family:Arial}
-        .chat{border:1px solid #ddd;padding:15px;height:400px;overflow-y:auto;margin-bottom:10px;border-radius:8px}
-        .msg{margin:8px 0;padding:10px;border-radius:6px;white-space:pre-wrap}
-        .user{background:#e3f2fd;text-align:right}
-        .bot{background:#f5f5f5;text-align:left}
-        input{width:70%;padding:10px}
-        button{padding:10px 16px}
-        .tip{color:#888;margin-bottom:10px}
-    </style>
-</head>
-<body>
-    <h2>AI 任务助手智能体</h2>
-    <div class="tip">支持查询天气、记忆内容、回忆已记忆内容。示例：广州天气、北京明天预报、记住我喜欢Python、你记得什么。</div>
-    <div class="chat" id="chat"></div>
-    <input id="msg" placeholder="输入消息…" />
-    <button onclick="send()">发送</button>
-    <button onclick="clearChat()">清空</button>
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartOffice AI - 一键语义碎纸机</title>
+    <script src="lib/marked.min.js"></script>
+    <script src="lib/tailwindcss.min.js"></script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <main class="mx-auto flex min-h-screen max-w-7xl flex-col gap-6 px-5 py-6 lg:px-8">
+      <header class="grid gap-5 border-b border-slate-800 pb-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-[0.28em] text-cyan-300">SmartOffice AI</p>
+          <h1 class="mt-3 text-3xl font-semibold text-white md:text-5xl">一键语义碎纸机</h1>
+          <p class="mt-4 max-w-3xl leading-7 text-slate-300">
+            面向中小企业文员的轻量办公原型，把微信群通知、纸质记录和会议笔记里的混乱信息整理为可确认的结构化表格。
+          </p>
+        </div>
+        <div class="grid grid-cols-3 gap-3 rounded-lg border border-slate-800 bg-slate-900 p-4">
+          <div>
+            <p class="text-2xl font-semibold text-cyan-200">1</p>
+            <p class="mt-1 text-sm text-slate-400">粘贴文本</p>
+          </div>
+          <div>
+            <p class="text-2xl font-semibold text-cyan-200">2</p>
+            <p class="mt-1 text-sm text-slate-400">AI 归整</p>
+          </div>
+          <div>
+            <p class="text-2xl font-semibold text-cyan-200">3</p>
+            <p class="mt-1 text-sm text-slate-400">人工确认</p>
+          </div>
+        </div>
+      </header>
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+      <section class="grid flex-1 gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <div class="flex flex-col gap-4">
+          <section class="rounded-lg border border-slate-800 bg-slate-900 p-5">
+            <label for="input-text" class="text-sm font-medium text-slate-200">混乱文本</label>
+            <textarea
+              id="input-text"
+              rows="12"
+              placeholder="例：周三下午两点行政部开会，小王带纸质报销单，李经理需要补合同编号；微信群里说财务周五前收齐供应商信息..."
+              class="mt-3 w-full resize-y rounded-lg border border-slate-700 bg-slate-950 p-4 text-sm leading-6 text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-cyan-400"
+            ></textarea>
+            <div class="mt-4 flex flex-col gap-3 sm:flex-row">
+              <button
+                id="shred-btn"
+                class="inline-flex items-center justify-center rounded-lg bg-cyan-400 px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                语义碎纸机
+              </button>
+              <button
+                id="light-btn"
+                class="inline-flex items-center justify-center rounded-lg border border-slate-700 bg-slate-950 px-5 py-3 text-slate-100 transition hover:border-cyan-400"
+              >
+                灯光反馈
+              </button>
+            </div>
+          </section>
+
+          <section class="rounded-lg border border-slate-800 bg-slate-900 p-5">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <h2 class="text-base font-semibold text-white">操作状态</h2>
+                <p class="mt-1 text-sm text-slate-400">流式输出会实时进入右侧预览。</p>
+              </div>
+              <span id="status-badge" class="rounded-full bg-slate-800 px-3 py-1 text-sm text-slate-300">空闲</span>
+            </div>
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+              <button
+                id="copy-markdown-btn"
+                class="rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 transition hover:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled
+              >
+                复制 Markdown
+              </button>
+              <button
+                id="confirm-btn"
+                class="rounded-lg bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled
+              >
+                确认表格
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <section class="min-h-[320px] rounded-lg border border-slate-800 bg-slate-900 p-5">
+            <div class="mb-4 flex items-center justify-between gap-4">
+              <div>
+                <h2 class="text-base font-semibold text-white">实时流式预览</h2>
+                <p class="mt-1 text-sm text-slate-400">先看 AI 草稿，再进入可编辑表格。</p>
+              </div>
+            </div>
+            <div
+              id="stream-output"
+              class="min-h-[235px] overflow-auto rounded-lg border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-200"
+            ></div>
+          </section>
+
+          <section id="editable-table-card" class="hidden rounded-lg border border-slate-800 bg-slate-900 p-5">
+            <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 class="text-base font-semibold text-white">可编辑表格</h2>
+                <p class="mt-1 text-sm text-slate-400">单击单元格即可修正，确认后会输出到浏览器控制台。</p>
+              </div>
+              <p class="text-sm text-cyan-300">AI 生成 + 人工确认</p>
+            </div>
+            <div id="table-container" class="overflow-auto"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="fixed bottom-5 right-5 hidden max-w-sm rounded-lg border border-slate-700 bg-slate-900 px-5 py-4 text-sm text-slate-100 shadow-2xl shadow-black/40"></div>
+
     <script>
-        async function send() {
-            let text = document.getElementById("msg").value.trim();
-            if (!text) return;
-            showMsg(text, "user");
-            document.getElementById("msg").value = "";
+      const inputText = document.getElementById('input-text');
+      const shredBtn = document.getElementById('shred-btn');
+      const lightBtn = document.getElementById('light-btn');
+      const copyBtn = document.getElementById('copy-markdown-btn');
+      const confirmBtn = document.getElementById('confirm-btn');
+      const streamOutput = document.getElementById('stream-output');
+      const statusBadge = document.getElementById('status-badge');
+      const editableCard = document.getElementById('editable-table-card');
+      const tableContainer = document.getElementById('table-container');
+      const toast = document.getElementById('toast');
 
-            try {
-                let res = await axios.post("http://localhost:8000/agent", {
-                    message: text
-                });
-                showMsg(res.data.reply, "bot");
-            } catch (err) {
-                showMsg("⚠️ 无法连接到后端，请先启动 Python 服务：uvicorn main:app --reload", "bot");
+      let finalMarkdown = '';
+      let streaming = false;
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+        clearTimeout(showToast.timeoutId);
+        showToast.timeoutId = setTimeout(() => {
+          toast.classList.add('hidden');
+        }, 2600);
+      }
+
+      function updateStatus(text) {
+        statusBadge.textContent = text;
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+
+      function renderMarkdown(markdown) {
+        streamOutput.innerHTML = marked.parse(markdown || '等待 AI 输出...');
+        streamOutput.querySelectorAll('table').forEach((table) => {
+          table.className = 'min-w-full border-collapse text-sm';
+        });
+        streamOutput.querySelectorAll('th').forEach((cell) => {
+          cell.className = 'border border-slate-700 bg-slate-900 px-3 py-2 text-left text-slate-100';
+        });
+        streamOutput.querySelectorAll('td').forEach((cell) => {
+          cell.className = 'border border-slate-700 px-3 py-2 text-slate-300';
+        });
+      }
+
+      function splitMarkdownRow(line) {
+        const normalized = line.trim().replace(/^\|/, '').replace(/\|$/, '');
+        return normalized.split('|').map((cell) => cell.trim());
+      }
+
+      function isSeparatorRow(line) {
+        return splitMarkdownRow(line).every((cell) => /^:?-{3,}:?$/.test(cell.replace(/\s/g, '')));
+      }
+
+      function parseMarkdownTable(markdown) {
+        const lines = markdown
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter(Boolean);
+
+        const startIndex = lines.findIndex((line, index) => line.includes('|') && lines[index + 1] && isSeparatorRow(lines[index + 1]));
+        if (startIndex === -1) return null;
+
+        const tableLines = [];
+        for (let index = startIndex; index < lines.length; index += 1) {
+          if (!lines[index].includes('|')) break;
+          tableLines.push(lines[index]);
+        }
+
+        if (tableLines.length < 2) return null;
+
+        const headerRow = splitMarkdownRow(tableLines[0]);
+        const bodyRows = tableLines.slice(2).map(splitMarkdownRow);
+        const maxCols = Math.max(headerRow.length, ...bodyRows.map((row) => row.length), 1);
+
+        return {
+          headerRow: headerRow.concat(Array(maxCols - headerRow.length).fill('')),
+          bodyRows: bodyRows.map((row) => row.concat(Array(maxCols - row.length).fill(''))),
+        };
+      }
+
+      function buildEditableTable(parsed) {
+        if (!parsed) {
+          tableContainer.innerHTML = `
+            <div class="rounded-lg border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-100">
+              未能自动识别标准 Markdown 表格。请检查 AI 输出格式，或复制 Markdown 后手动整理。
+            </div>
+            <pre class="mt-4 overflow-auto rounded-lg border border-slate-800 bg-slate-950 p-4 text-sm text-slate-300">${escapeHtml(finalMarkdown)}</pre>
+          `;
+          return;
+        }
+
+        const table = document.createElement('table');
+        table.className = 'min-w-full border-collapse text-sm';
+
+        const thead = document.createElement('thead');
+        const headRow = document.createElement('tr');
+        parsed.headerRow.forEach((cellText, index) => {
+          const th = document.createElement('th');
+          th.contentEditable = 'true';
+          th.dataset.column = String(index);
+          th.className = 'min-w-[140px] border border-slate-700 bg-slate-950 px-3 py-3 text-left font-semibold text-slate-100 outline-none focus:bg-slate-800';
+          th.textContent = cellText || `列 ${index + 1}`;
+          headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        parsed.bodyRows.forEach((row) => {
+          const tr = document.createElement('tr');
+          tr.className = 'odd:bg-slate-950 even:bg-slate-900';
+          row.forEach((cellText) => {
+            const td = document.createElement('td');
+            td.contentEditable = 'true';
+            td.className = 'min-w-[140px] border border-slate-700 px-3 py-3 text-slate-100 outline-none focus:bg-slate-800';
+            td.textContent = cellText;
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+
+        table.appendChild(tbody);
+        tableContainer.innerHTML = '';
+        tableContainer.appendChild(table);
+      }
+
+      function collectTableData() {
+        const table = tableContainer.querySelector('table');
+        if (!table) return null;
+
+        const headers = Array.from(table.querySelectorAll('thead th')).map((cell) => cell.textContent.trim());
+        const rows = Array.from(table.querySelectorAll('tbody tr')).map((row) =>
+          Array.from(row.querySelectorAll('td')).map((cell) => cell.textContent.trim())
+        );
+
+        return { headers, rows };
+      }
+
+      function parseSseChunk(chunk) {
+        const lines = chunk.split(/\r?\n/);
+        let event = 'message';
+        let payload = '';
+
+        for (const line of lines) {
+          if (line.startsWith('event:')) {
+            event = line.slice(6).trim();
+          } else if (line.startsWith('data:')) {
+            payload += line.slice(5).trim();
+          }
+        }
+
+        if (!payload) return null;
+
+        try {
+          return { event, data: JSON.parse(payload) };
+        } catch (error) {
+          console.error('SSE 数据解析失败：', error, payload);
+          return null;
+        }
+      }
+
+      async function startStreaming(rawText) {
+        shredBtn.disabled = true;
+        confirmBtn.disabled = true;
+        copyBtn.disabled = true;
+        finalMarkdown = '';
+        editableCard.classList.add('hidden');
+        streamOutput.innerHTML = '<p class="text-slate-400">正在连接 Coze，并实时展示 AI 流式结果...</p>';
+        updateStatus('处理中');
+
+        try {
+          const response = await fetch('/api/shred', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: rawText }),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || '服务器返回错误。');
+          }
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const chunks = buffer.split(/\n\n/);
+            buffer = chunks.pop() || '';
+
+            for (const chunk of chunks) {
+              const parsed = parseSseChunk(chunk);
+              if (!parsed) continue;
+
+              if (parsed.event === 'progress') {
+                finalMarkdown = parsed.data.markdown;
+                renderMarkdown(finalMarkdown);
+              }
+
+              if (parsed.event === 'done') {
+                finalMarkdown = parsed.data.markdown;
+                renderMarkdown(finalMarkdown);
+                buildEditableTable(parseMarkdownTable(finalMarkdown));
+                editableCard.classList.remove('hidden');
+                confirmBtn.disabled = false;
+                copyBtn.disabled = false;
+                updateStatus('已完成');
+                showToast('AI 输出已完成，可以编辑并确认表格。');
+              }
+
+              if (parsed.event === 'error') {
+                throw new Error(parsed.data?.message || '后端返回未知错误。');
+              }
             }
+          }
+
+          if (!finalMarkdown) {
+            updateStatus('空结果');
+            showToast('未生成 Markdown，请稍后重试。');
+          }
+        } catch (error) {
+          streamOutput.innerHTML = `<p class="text-rose-300">${escapeHtml(error.message)}</p>`;
+          updateStatus('错误');
+          showToast('发生错误，请检查后重试。');
+          console.error(error);
+        } finally {
+          shredBtn.disabled = false;
+          if (finalMarkdown) copyBtn.disabled = false;
+        }
+      }
+
+      shredBtn.addEventListener('click', () => {
+        const rawText = inputText.value.trim();
+        if (!rawText) {
+          showToast('请输入混乱文本后再尝试。');
+          return;
         }
 
-        function showMsg(text, role) {
-            let dom = document.createElement("div");
-            dom.className = "msg " + role;
-            dom.innerText = text;
-            document.getElementById("chat").appendChild(dom);
-            window.scrollTo(0, document.body.scrollHeight);
+        if (streaming) return;
+        streaming = true;
+        startStreaming(rawText).finally(() => {
+          streaming = false;
+        });
+      });
+
+      lightBtn.addEventListener('click', () => {
+        showToast('未来版本可联动桌面智能灯：任务完成时轻闪提醒。');
+      });
+
+      copyBtn.addEventListener('click', async () => {
+        if (!finalMarkdown) return;
+        await navigator.clipboard.writeText(finalMarkdown);
+        showToast('Markdown 已复制。');
+      });
+
+      confirmBtn.addEventListener('click', () => {
+        const tableData = collectTableData();
+        if (!tableData) {
+          showToast('没有可确认的表格。');
+          return;
         }
 
-        async function clearChat() {
-            await axios.post("http://localhost:8000/clear");
-            document.getElementById("chat").innerHTML = "";
-        }
+        console.log('Confirmed table data:', tableData);
+        showToast('表格已确认，数据已输出到控制台。');
+      });
+
+      renderMarkdown('等待 AI 输出...');
     </script>
-</body>
+  </body>
 </html>
